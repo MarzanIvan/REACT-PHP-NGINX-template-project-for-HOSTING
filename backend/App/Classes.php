@@ -79,63 +79,6 @@ class DB{
 	}
 }
 
-class TableProviders{
-	public function WriteProviderToDB(  ) {
-		try {
-			$Writing = mysqli_query("
-				INSERT INTO 
-				providers
-				(name, address, numbertelephone, email)
-				VALUES
-				('".$_POST['name']."','".$_POST['address']."','".$_POST['numbertelephone']."','".$_POST['email']."')"
-			);
-		}catch( Exception $Error) {
-			die($Error->getMessage());
-		}
-	}
-}
-
-class ExceptionLoadingImage extends  Exception{
-	public function ShowExplainImage() {
-		?>
-		<img href="Source/Photoes/LoadingNonExistentFile.jpg">
-		<?
-	}
-}
-
-class File {
-	private $PathFile;
-	public function __construct( $PathFile) {
-		$this->PathFile = $PathFile;
-	}
-
-	public function SaveFileToPath( $PathToSave ) {
-		move_uploaded_file( $this->PathFile, "../".$PathToSave );
-	}
-
-	public function ShowImage() {
-		try {
-			if ( file_exists($this->PathFile) ) {
-				throw new ExceptionLoadingImage();
-			}
-			?>
-				<img src="../<? echo $this->PathFile;?>">
-			<?
-		} 
-		catch ( ExceptionLoadingImage $ErrorLoading ) {
-			$ErrorLoading->ShowExplainImage();
-		}
-	}
-
-	public function DeleteFile() {
-		unlink( $this->PathFile );
-	}
-
-	public function __destruct() {
-		$this->PathFile = null;
-	} 
-
-}
 
 class ExceptionIncorrectInputting {
 	private $MessageExplaining;

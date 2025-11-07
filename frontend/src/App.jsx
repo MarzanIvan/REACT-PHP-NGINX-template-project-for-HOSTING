@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [name, setName] = useState("");
+  const [users, setUsers] = useState([]);
+
+  // Загружаем список пользователей при запуске
+  useEffect(() => {
+    fetch("/api/get_users.php")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.error("Ошибка загрузки:", err));
+  }, []);
+
+  // Отправляем форму
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    const formData = new FormData();
+    formData.append("name", name);
+
+    fetch("/api/add_user.php", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setUsers((prev) => [...prev, { id: data.id, name }]);
+          setName("");
+        } else {
+          alert("Ошибка добавления: " + data.error);
+        }
+      })
+      .catch((err) => console.error("Ошибка запроса:", err));
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container">
+      <h1>Добавление ФИО в базу</h1>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Введите ФИО"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <button type="submit">Добавить</button>
+      </form>
+
+      <h2>Список пользователей:</h2>
+      <ul>
+        {users.map((u) => (
+          <li key={u.id}>{u.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
