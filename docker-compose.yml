@@ -1,0 +1,46 @@
+networks:
+  dev:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certs:/etc/ssl/certs  # Монтируем локальную папку с сертификатами
+      - './nginx.conf:/etc/nginx/nginx.conf'
+      - /etc/letsencrypt/:/etc/letsencrypt/
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - dev
+
+  backend:
+    build:
+      context: ./backend
+    networks:
+      - dev
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - /home/root/.mozilla/firefox/guest:/root/.mozilla/firefox:ro  # Мон
+      - ./downloads:/root/Downloads
+      - ./cookies.txt:/cookies.txt
+    environment:
+      - COOKIE_DB_PATH=/home/root/.mozilla/firefox/guest/cookies.sqlite
+    mem_limit: 2024m
+    mem_reservation: 256m
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+    networks:
+      - dev
+    volumes:
+      - /etc/letsencrypt/live/videovault.ru:/certs:ro  # Монтируем сертификаты с хоста в контейнер
+      - ./certs:/etc/ssl/certs  # Монтируем локальную папку с сертификатами
+      - /etc/letsencrypt/live/videovault.ru/:/etc/letsencrypt/live/videovault.ru/
