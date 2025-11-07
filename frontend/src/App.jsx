@@ -5,7 +5,6 @@ function App() {
   const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
 
-  // Загружаем список пользователей при запуске
   useEffect(() => {
     fetch("/api/get_users.php")
       .then((res) => res.json())
@@ -13,7 +12,6 @@ function App() {
       .catch((err) => console.error("Ошибка загрузки:", err));
   }, []);
 
-  // Отправляем форму
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;

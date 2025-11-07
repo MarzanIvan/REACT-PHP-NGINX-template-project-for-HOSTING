@@ -22,9 +22,8 @@ services:
       context: ./backend
     networks:
       - dev
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+    ports:
+      - 8000:80
     mem_limit: 2024m
     mem_reservation: 256m
     restart: always
@@ -38,3 +37,21 @@ services:
       - /etc/letsencrypt/live/videovault.ru:/certs:ro  # Монтируем сертификаты с хоста в контейнер
       - ./certs:/etc/ssl/certs  # Монтируем локальную папку с сертификатами
       - /etc/letsencrypt/live/videovault.ru/:/etc/letsencrypt/live/videovault.ru/
+
+  mysql_db:
+    image: mysql:latest
+    networks:
+      - dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    networks:
+      - dev
+    restart: always
+    ports:
+      - 8001:80
+    environment:
+      - PMA_ARBITRARY=1

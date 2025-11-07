@@ -1,6 +1,5 @@
 <?php
 header('Content-Type: application/json');
-global$Server;
 require_once 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
